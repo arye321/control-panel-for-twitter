@@ -43,6 +43,7 @@
       "safari/",
       "screenshots/",
       "scripts/",
+      "tests/",
       "types.d.ts"
     ]
   },

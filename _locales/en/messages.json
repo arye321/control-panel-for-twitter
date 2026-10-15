@@ -73,7 +73,7 @@
     "message": "Experiments"
   },
   "exportConfigLabel": {
-    "message": "Export configuration for bug report"
+    "message": "Export settings"
   },
   "extensionDescription": {
     "message": "Gives you more control over Twitter and adds missing features and UI improvements",
@@ -84,10 +84,10 @@
     "description": "<= 112 characters"
   },
   "extensionName": {
-    "message": "Control Panel for Twitter"
+    "message": "Control Panel for Twitter (Personal Modified Copy)"
   },
   "extensionNameDisabled": {
-    "message": "Control Panel for Twitter (disabled)"
+    "message": "Control Panel for Twitter (disabled) (Personal)"
   },
   "fastBlockLabel": {
     "message": "Fast blocking (skips confirm dialog)"
@@ -503,5 +503,20 @@
   },
   "xFixesLabel": {
     "message": "X fixes"
+  },
+  "hidePostsByUserNameLabel": {
+    "message": "Hide posts by user name"
+  },
+  "hidePostsByUserNameInfo": {
+    "message": "Hide posts and replies whose author's display name or @handle contains any of these comma-separated strings. Matching ignores case. Leave empty to show all users."
+  },
+  "importConfigLabel": {
+    "message": "Import settings"
+  },
+  "importConfigSuccess": {
+    "message": "Imported $1 settings. Unknown or incompatible settings were skipped."
+  },
+  "importConfigError": {
+    "message": "Could not import settings. Choose a valid settings JSON file and try again."
   }
 }

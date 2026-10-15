@@ -80,6 +80,9 @@ for (let translationId of [
   'hideForYouTimelineLabel',
   'hideGrokLabel',
   'hideGrokTweetsLabel',
+  'hidePostsByUserNameLabel',
+  'hidePostsByUserNameInfo',
+  'importConfigLabel',
   'hideInlinePrompts',
   'hideJobsLabel',
   'hideLikeMetricsLabel',
@@ -239,6 +242,7 @@ const defaultConfig = {
   hideForYouTimeline: true,
   hideGrokNav: true,
   hideGrokTweets: false,
+  hidePostsByUserName: '',
   hideHistoryNav: false,
   hideInlinePrompts: true,
   hideJobsNav: true,
@@ -354,12 +358,73 @@ let $showBlueReplyFollowersCountLabel = /** @type {HTMLElement} */ (document.que
 //#region Utility functions
 function exportConfig() {
   let $a = document.createElement('a')
-  $a.download = 'control-panel-for-twitter-v4.25.1.config.txt'
+  $a.download = `control-panel-for-twitter-v${chrome.runtime.getManifest().version}.config.json`
   $a.href = URL.createObjectURL(new Blob([
-    JSON.stringify(optionsConfig, null, 2)
-  ], {type: 'text/plain'}))
+    JSON.stringify(Object.fromEntries(Object.keys(defaultConfig).filter(key => key != 'version').map(key => [key, optionsConfig[key]])), null, 2)
+  ], {type: 'application/json'}))
+  document.body.appendChild($a)
   $a.click()
-  URL.revokeObjectURL($a.href)
+  $a.remove()
+  setTimeout(() => URL.revokeObjectURL($a.href), 1000)
+}
+
+// A toolbar popup can be destroyed when the native file picker takes focus.
+// Keep the import in the persistent options page so its async work can finish.
+function configureImportControl() {
+  let $input = document.querySelector('#import-config')
+  if ($body.classList.contains('browserAction')) {
+    let $button = document.createElement('button')
+    $button.type = 'button'
+    $button.id = 'import-config'
+    $button.textContent = chrome.i18n.getMessage('importConfigLabel')
+    $button.addEventListener('click', () => chrome.runtime.openOptionsPage())
+    $input.replaceWith($button)
+  } else {
+    $input.addEventListener('change', importConfig)
+  }
+}
+
+/** Import only settings understood by this version, preserving missing settings. */
+async function importConfig(e) {
+  let $input = /** @type {HTMLInputElement} */ (e.target)
+  let file = $input.files[0]
+  if (!file) return
+  let $status = document.querySelector('#importConfigStatus')
+  try {
+    let imported = JSON.parse((await file.text()).replace(/^\uFEFF/, ''))
+    if (!imported || typeof imported != 'object' || Array.isArray(imported)) throw new Error('Invalid settings object')
+    let changes = {}
+    for (let [key, value] of Object.entries(imported)) {
+      if (key == 'version' || !Object.hasOwn(defaultConfig, key)) continue
+      let expected = defaultConfig[key]
+      if (Array.isArray(expected)) {
+        if (!Array.isArray(value)) continue
+        if (key == 'hideQuotesFrom' && !value.every(item => typeof item == 'string')) continue
+        if (key == 'mutedQuotes' && !value.every(item => item && typeof item == 'object' &&
+            typeof item.user == 'string' && typeof item.time == 'string' &&
+            (item.text == null || typeof item.text == 'string') &&
+            (item.quotedBy == null || typeof item.quotedBy == 'string'))) continue
+      } else if (typeof value != typeof expected) {
+        continue
+      }
+      let $select = $form.querySelector(`select[name="${key}"]`)
+      if ($select && !Array.from(/** @type {HTMLSelectElement} */ ($select).options).some(option => option.value === value)) continue
+      changes[key] = value
+    }
+    await new Promise((resolve, reject) => {
+      chrome.storage.local.set(changes, () => {
+        if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message))
+        else resolve(undefined)
+      })
+    })
+    Object.assign(optionsConfig, changes)
+    applyConfig()
+    $status.textContent = chrome.i18n.getMessage('importConfigSuccess', String(Object.keys(changes).length))
+  } catch (error) {
+    $status.textContent = chrome.i18n.getMessage('importConfigError')
+  } finally {
+    $input.value = ''
+  }
 }
 
 function formatFollowerCount(num) {
@@ -428,7 +493,8 @@ function applyConfig() {
  * @param {Event} e
  */
 function onFormChanged(e) {
-  if (e.target instanceof HTMLTextAreaElement) return
+  if (e.target instanceof HTMLTextAreaElement && e.target.name != 'hidePostsByUserName') return
+  if (e.target instanceof HTMLInputElement && e.target.type == 'file') return
 
   /** @type {Partial<import("./types").Config>} */
   let changedConfig = {}
@@ -627,6 +693,7 @@ function main() {
     $body.classList.toggle('debug', optionsConfig.debug === true)
     $experiments.open = Boolean(optionsConfig.customCss)
     $exportConfig.addEventListener('click', exportConfig)
+    configureImportControl()
     $form.addEventListener('change', onFormChanged)
     $hideQuotesFromDetails.addEventListener('toggle', updateHideQuotesFromDisplay)
     $mutedQuotesDetails.addEventListener('toggle', updateMutedQuotesDisplay)

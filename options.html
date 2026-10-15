@@ -18,6 +18,13 @@
         <span class="toggle"></span>
       </label>
     </section>
+    <section class="group">
+      <section class="textarea">
+        <label id="hidePostsByUserNameLabel" for="hidePostsByUserName">Hide posts by user name</label>
+        <textarea id="hidePostsByUserName" name="hidePostsByUserName" rows="3" aria-describedby="hidePostsByUserNameInfo"></textarea>
+        <p id="hidePostsByUserNameInfo">Hide posts and replies whose author's display name or @handle contains any of these comma-separated strings. Matching ignores case. Leave empty to show all users.</p>
+      </section>
+    </section>
     <section class="group labelled">
       <label id="homeTimelineOptionsLabel">
         Home timeline
@@ -927,15 +934,20 @@
           </label>
         </section>
       </section>
-      <section>
-        <label class="button">
-          <span id="exportConfigLabel">Export configuration for bug report</span>
-          <input type="button" value="Export" id="export-config">
-        </label>
-      </section>
     </section>
 
-    <div id="version">v4.25.1<span id="debugCountdown"></span></div>
+    <section class="group">
+      <label class="button">
+        <span id="exportConfigLabel">Export settings</span>
+        <button type="button" id="export-config">Export</button>
+      </label>
+      <label class="button" for="import-config">
+        <span id="importConfigLabel">Import settings</span>
+        <input type="file" id="import-config" accept=".json,.txt,application/json,text/plain">
+      </label>
+      <p id="importConfigStatus" role="status" aria-live="polite"></p>
+    </section>
+    <div id="version">v4.26.0<span id="debugCountdown"></span></div>
   </form>
   <script src="options.js"></script>
 </body>

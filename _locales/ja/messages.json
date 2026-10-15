@@ -81,10 +81,10 @@
     "message": "Twitter をより細かく制御し、不足している機能を追加して UI を改善します"
   },
   "extensionName": {
-    "message": "Control Panel for Twitter"
+    "message": "Control Panel for Twitter (Personal)"
   },
   "extensionNameDisabled": {
-    "message": "Control Panel for Twitter (無効)"
+    "message": "Control Panel for Twitter (無効) (Personal)"
   },
   "fastBlockLabel": {
     "message": "即ブロック（確認画面をスキップする）"

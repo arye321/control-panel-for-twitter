@@ -81,10 +81,10 @@
     "message": "让你对Twitter有更多的控制，并增加了缺失的功能和UI改进"
   },
   "extensionName": {
-    "message": "Control Panel for Twitter"
+    "message": "Control Panel for Twitter (Personal)"
   },
   "extensionNameDisabled": {
-    "message": "Control Panel for Twitter (已禁用)"
+    "message": "Control Panel for Twitter (已禁用) (Personal)"
   },
   "fastBlockLabel": {
     "message": "快速屏蔽(跳过确认对话框)"

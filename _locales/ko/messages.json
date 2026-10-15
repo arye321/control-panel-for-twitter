@@ -81,10 +81,10 @@
     "message": "트위터에 대한 더 많은 제어권을 제공하고 기능을 보완하며 UI를 개선합니다"
   },
   "extensionName": {
-    "message": "Control Panel for Twitter"
+    "message": "Control Panel for Twitter (Personal)"
   },
   "extensionNameDisabled": {
-    "message": "Control Panel for Twitter (비활성화됨)"
+    "message": "Control Panel for Twitter (비활성화됨) (Personal)"
   },
   "fastBlockLabel": {
     "message": "빠른 차단 (확인 대화상자 생략)"

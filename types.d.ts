@@ -35,6 +35,7 @@ export type Config = {
   hideForYouTimeline: boolean
   hideGrokNav: boolean
   hideGrokTweets: boolean
+  hidePostsByUserName: string
   hideHistoryNav: boolean
   hideInlinePrompts: boolean
   hideJobsNav: boolean

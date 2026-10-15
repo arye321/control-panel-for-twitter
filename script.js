@@ -160,6 +160,7 @@ const config = {
   hideForYouTimeline: true,
   hideGrokNav: true,
   hideGrokTweets: false,
+  hidePostsByUserName: '',
   hideHistoryNav: false,
   hideInlinePrompts: true,
   hideJobsNav: true,
@@ -6088,6 +6089,22 @@ function onPopup($popup) {
   return nestedObserver
 }
 
+/** @param {HTMLElement} $tweet */
+function shouldHidePostByUserName($tweet) {
+  let terms = config.hidePostsByUserName.split(',').map(term => term.trim().toLowerCase()).filter(Boolean)
+  if (!terms.length) return false
+  // The first User-Name belongs to the author, not an embedded quoted post.
+  let $author = $tweet.querySelector('[data-testid="User-Name"]')
+  if (!$author) return false
+  let names = Array.from($author.querySelectorAll('a')).flatMap($link => [
+    $link.pathname?.split('/')[1] || '',
+    Array.from($link.querySelectorAll('span, img')).map($part =>
+      $part.tagName == 'IMG' ? $part.getAttribute('alt') : $part.childElementCount == 0 ? $part.textContent : ''
+    ).join(''),
+  ]).map(name => name.toLowerCase())
+  return terms.some(term => names.some(name => name.includes(term)))
+}
+
 /**
  * @param {HTMLElement} $timeline
  * @param {string} page
@@ -6236,6 +6253,8 @@ function onTimelineChange($timeline, page, options = {}) {
         hideItem = shouldHideOtherTimelineItem(itemType)
       }
     }
+
+    if ($tweet && shouldHidePostByUserName($tweet)) hideItem = true
 
     // Special handling for non-Tweet timeline items
     if (itemType == null) {
@@ -6532,7 +6551,8 @@ function onIndividualTweetTimelineChange($timeline, options) {
       hiddenItemCount = 0
       hiddenItemTypes = {}
     }
-    else if (hideItem != null && $item.firstElementChild) {
+    if ($tweet && shouldHidePostByUserName($tweet)) hideItem = true
+    if (hideItem != null && $item.firstElementChild) {
       let hidden = $item.firstElementChild.classList.contains('HiddenTweet')
       if (hidden != hideItem) {
         changes.push({$item, hideItem})
